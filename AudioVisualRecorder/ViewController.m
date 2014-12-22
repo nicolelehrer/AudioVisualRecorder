@@ -23,6 +23,9 @@ static void * SessionRunningAndDeviceAuthorizedContext = &SessionRunningAndDevic
 @property (nonatomic, weak) IBOutlet UIButton *recordButton;
 @property (nonatomic, weak) IBOutlet UIButton *cameraButton;
 @property (nonatomic, weak) IBOutlet UIButton *stillButton;
+@property (weak, nonatomic) IBOutlet UILabel *volumeDisplay;
+@property (weak, nonatomic) IBOutlet UISlider *levelIndicator;
+@property (weak, nonatomic) IBOutlet UISlider *logLevelIndicator;
 
 //session management
 
@@ -119,6 +122,10 @@ static void * SessionRunningAndDeviceAuthorizedContext = &SessionRunningAndDevic
         }
         
     });
+    
+    
+    [NSTimer scheduledTimerWithTimeInterval:.25 target:self selector:@selector(checkAudioLevels) userInfo:nil repeats:YES];
+
 }
 
 - (void)viewWillAppear:(BOOL)animated
@@ -402,6 +409,63 @@ static void * SessionRunningAndDeviceAuthorizedContext = &SessionRunningAndDevic
             });
         }
     }];
+}
+
+
+//monitor audio
+
+- (void)checkAudioLevels
+{
+    
+      NSInteger channelCount = 0;
+     float decibels = 0.f;
+     
+     // Sum all of the average power levels and divide by the number of channels
+     for (AVCaptureConnection *connection in [[self movieFileOutput] connections]) {
+         for (AVCaptureAudioChannel *audioChannel in [connection audioChannels]) {
+            decibels += [audioChannel averagePowerLevel];
+            channelCount += 1;
+         }
+     }
+     
+     decibels /= channelCount;
+     
+//     [[self audioLevelMeter] setFloatValue:(pow(10.f, 0.05f * decibels) * 20.0f)];
+    
+    
+    self.logLevelIndicator.value = decibels;
+    self.logLevelIndicator.maximumValue = 0;
+    self.logLevelIndicator.minimumValue = -90;
+    
+    
+    float meterLevel = pow(10.f, 0.05f * decibels) * 20.0f;
+    self.volumeDisplay.text = [NSString stringWithFormat:@"%f", decibels];
+    
+    self.levelIndicator.value = meterLevel;
+    self.levelIndicator.maximumValue = 14;
+    self.levelIndicator.minimumValue = 0;
+    
+    
+    
+    
+    
+    /*
+    
+     http://stackoverflow.com/questions/2465328/iphone-sdk-avaudiorecorder-metering-how-to-change-peakpowerforchannel-from-d
+     
+     The range is from -160 dB to 0 dB. You probably want to display it in a meter that goes from -90 dB to 0 dB. Displaying it as decibels is actually more useful than as a linear audio level, because the decibels are a logarithmic scale, which means that it more closely approximates how loud we perceive a sound.
+     
+     That said, you can use this to convert from decibels to linear:
+     
+     linear = pow (10, decibels / 20);
+     
+     and the reverse:
+     
+     decibels = log10 (linear) * 20;
+     
+     The range for the above decibels is negative infinity to zero, and for linear is 0.0 to 1.0. When the linear value is 0.0, that is -inf dB; linear at 1.0 is 0 dB.
+     */
+    
 }
 
 
