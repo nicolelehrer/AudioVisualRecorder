@@ -1,4 +1,4 @@
-//
+ //
 //  ViewController.m
 //  AudioVisualRecorder
 //
@@ -11,6 +11,7 @@
 #import <AVFoundation/AVFoundation.h>
 #import <AssetsLibrary/AssetsLibrary.h>
 #import "VideoView.h"
+#import "PlayerViewController.h"
 
 static void * CapturingStillImageContext = &CapturingStillImageContext;
 static void * RecordingContext = &RecordingContext;
@@ -33,7 +34,7 @@ static void * SessionRunningAndDeviceAuthorizedContext = &SessionRunningAndDevic
 @property (nonatomic) AVCaptureDeviceInput *videoDeviceInput;
 @property (nonatomic) dispatch_queue_t sessionQueue; // Communicate with the session and other session objects on this queue.
 @property (nonatomic) AVCaptureMovieFileOutput *movieFileOutput;
-
+@property (nonatomic) NSURL * outputURL;
 
 //utilities
 @property (nonatomic, getter = isDeviceAuthorized) BOOL deviceAuthorized;
@@ -43,11 +44,16 @@ static void * SessionRunningAndDeviceAuthorizedContext = &SessionRunningAndDevic
 
 @property (nonatomic) UIInterfaceOrientation newOrientation;
 
+
+//audio data
+@property (nonatomic) NSMutableArray * savedAudioLevels;
+
+
 @end
 
 @implementation ViewController
 @synthesize session = _session;
-
+@synthesize outputURL = _outputURL;
 
 
 - (void)viewDidLoad
@@ -125,8 +131,13 @@ static void * SessionRunningAndDeviceAuthorizedContext = &SessionRunningAndDevic
     
     
     [NSTimer scheduledTimerWithTimeInterval:.25 target:self selector:@selector(checkAudioLevels) userInfo:nil repeats:YES];
+    
+    self.savedAudioLevels = [[NSMutableArray alloc] init];
 
 }
+
+
+
 
 - (void)viewWillAppear:(BOOL)animated
 {
@@ -158,7 +169,7 @@ static void * SessionRunningAndDeviceAuthorizedContext = &SessionRunningAndDevic
         [[NSNotificationCenter defaultCenter] removeObserver:[self runtimeErrorHandlingObserver]];
         
         [self removeObserver:self forKeyPath:@"sessionRunningAndDeviceAuthorized" context:SessionRunningAndDeviceAuthorizedContext];
-        [self removeObserver:self forKeyPath:@"stillImageOutput.capturingStillImage" context:CapturingStillImageContext];
+//        [self removeObserver:self forKeyPath:@"stillImageOutput.capturingStillImage" context:CapturingStillImageContext];
         [self removeObserver:self forKeyPath:@"movieFileOutput.recording" context:RecordingContext];
     });
 }
@@ -269,18 +280,58 @@ static void * SessionRunningAndDeviceAuthorizedContext = &SessionRunningAndDevic
             // Start recording to a temporary file.
             NSString *outputFilePath = [NSTemporaryDirectory() stringByAppendingPathComponent:[@"movie" stringByAppendingPathExtension:@"mov"]];
             [[self movieFileOutput] startRecordingToOutputFileURL:[NSURL fileURLWithPath:outputFilePath] recordingDelegate:self];
+            
+            
+            
         }
         else
         {
             [[self movieFileOutput] stopRecording];
+            
+            
+            NSLog(@"this is the file URL at the location: %@", self.movieFileOutput.outputFileURL);
+            
+//            [self copyFileToDocuments:self.movieFileOutput.outputFileURL];
+            
+            NSLog(@"size of self.savedAudioLevels is %i", [self.savedAudioLevels count]);
+            
+            
+            
         }
     });
 }
+
+
+- (void) copyFileToDocuments:(NSURL *)fileURL
+{
+    NSString *documentsDirectory = [NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES) objectAtIndex:0];
+    NSDateFormatter *dateFormatter = [[NSDateFormatter alloc] init];
+    [dateFormatter setDateFormat:@"yyyy-MM-dd_HH-mm-ss"];
+    NSString *destinationPath = [documentsDirectory stringByAppendingFormat:@"/output_%@.mov", [dateFormatter stringFromDate:[NSDate date]]];
+    //	[dateFormatter release];
+    NSError	*error;
+    if (![[NSFileManager defaultManager] copyItemAtURL:fileURL toURL:[NSURL fileURLWithPath:destinationPath] error:&error]) {
+//        if ([[self delegate] respondsToSelector:@selector(captureManager:didFailWithError:)]) {
+//            [[self delegate] captureManager:self didFailWithError:error];
+//        }
+        NSLog(@"you got an error - removed error handling need to put back");
+    }
+    
+    NSLog(@"URL in the documents directory is %@", destinationPath);
+    
+    self.outputURL = [[NSURL alloc] initWithString:destinationPath];
+
+}
+
+
+
 
 #pragma mark File Output Delegate
 
 - (void)captureOutput:(AVCaptureFileOutput *)captureOutput didFinishRecordingToOutputFileAtURL:(NSURL *)outputFileURL fromConnections:(NSArray *)connections error:(NSError *)error
 {
+    
+    
     if (error)
         NSLog(@"%@", error);
     
@@ -293,6 +344,12 @@ static void * SessionRunningAndDeviceAuthorizedContext = &SessionRunningAndDevic
     [[[ALAssetsLibrary alloc] init] writeVideoAtPathToSavedPhotosAlbum:outputFileURL completionBlock:^(NSURL *assetURL, NSError *error) {
         if (error)
             NSLog(@"%@", error);
+        
+        NSLog(@"assetURL %@", assetURL);
+        self.outputURL = [[NSURL alloc] init];
+        self.outputURL = assetURL;
+
+
         
         [[NSFileManager defaultManager] removeItemAtURL:outputFileURL error:nil];
         
@@ -416,36 +473,40 @@ static void * SessionRunningAndDeviceAuthorizedContext = &SessionRunningAndDevic
 
 - (void)checkAudioLevels
 {
-    
-      NSInteger channelCount = 0;
-     float decibels = 0.f;
-     
-     // Sum all of the average power levels and divide by the number of channels
-     for (AVCaptureConnection *connection in [[self movieFileOutput] connections]) {
-         for (AVCaptureAudioChannel *audioChannel in [connection audioChannels]) {
-            decibels += [audioChannel averagePowerLevel];
-            channelCount += 1;
+    if ([[self movieFileOutput] isRecording]) {
+        
+          NSInteger channelCount = 0;
+         float decibels = 0.f;
+         
+         // Sum all of the average power levels and divide by the number of channels
+         for (AVCaptureConnection *connection in [[self movieFileOutput] connections]) {
+             for (AVCaptureAudioChannel *audioChannel in [connection audioChannels]) {
+                decibels += [audioChannel averagePowerLevel];
+                channelCount += 1;
+             }
          }
-     }
-     
-     decibels /= channelCount;
-     
-//     [[self audioLevelMeter] setFloatValue:(pow(10.f, 0.05f * decibels) * 20.0f)];
+         
+         decibels /= channelCount;
+         
+    //     [[self audioLevelMeter] setFloatValue:(pow(10.f, 0.05f * decibels) * 20.0f)];
+        
+        
+        self.logLevelIndicator.value = decibels;
+        self.logLevelIndicator.maximumValue = 0;
+        self.logLevelIndicator.minimumValue = -90;
+        
+        
+        float meterLevel = pow(10.f, 0.05f * decibels) * 20.0f;
+        self.volumeDisplay.text = [NSString stringWithFormat:@"%f", decibels];
+        
+        self.levelIndicator.value = meterLevel;
+        self.levelIndicator.maximumValue = 14;
+        self.levelIndicator.minimumValue = 0;
     
-    
-    self.logLevelIndicator.value = decibels;
-    self.logLevelIndicator.maximumValue = 0;
-    self.logLevelIndicator.minimumValue = -90;
-    
-    
-    float meterLevel = pow(10.f, 0.05f * decibels) * 20.0f;
-    self.volumeDisplay.text = [NSString stringWithFormat:@"%f", decibels];
-    
-    self.levelIndicator.value = meterLevel;
-    self.levelIndicator.maximumValue = 14;
-    self.levelIndicator.minimumValue = 0;
-    
-    
+        
+        [self.savedAudioLevels addObject:[NSNumber numberWithFloat:meterLevel]];
+        
+    }
     
     
     
@@ -466,6 +527,36 @@ static void * SessionRunningAndDeviceAuthorizedContext = &SessionRunningAndDevic
      The range for the above decibels is negative infinity to zero, and for linear is 0.0 to 1.0. When the linear value is 0.0, that is -inf dB; linear at 1.0 is 0 dB.
      */
     
+}
+
+
+//segue
+
+- (void)prepareForSegue:(UIStoryboardSegue *)segue sender:(id)sender
+{
+    if ([[segue identifier] isEqualToString:@"TestLoad"]) {
+        
+
+        
+        PlayerViewController * avmvc = segue.destinationViewController;
+        
+        avmvc.fileURL = self.outputURL;
+
+        NSLog(@"this is local file URL: %@", self.outputURL);
+//
+        NSLog(@"this is passed file URL: %@", avmvc.fileURL);
+        
+        avmvc.audioLevelSummary = self.savedAudioLevels;
+        
+        int i;
+        
+        for (i=0; i<[self.savedAudioLevels count]; i++){
+            NSLog(@"saved level at position %i is %f", i, [[self.savedAudioLevels objectAtIndex:i]floatValue]);
+        
+        }
+
+        
+    }
 }
 
 
