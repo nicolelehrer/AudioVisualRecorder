@@ -20,6 +20,7 @@ static void * SessionRunningAndDeviceAuthorizedContext = &SessionRunningAndDevic
 @interface ViewController ()  <AVCaptureFileOutputRecordingDelegate>
 
 //UI
+@property (weak, nonatomic) IBOutlet UIButton *nextButton;
 @property (nonatomic, weak) IBOutlet VideoView *videoView;
 @property (nonatomic, weak) IBOutlet UIButton *recordButton;
 @property (nonatomic, weak) IBOutlet UIButton *cameraButton;
@@ -59,6 +60,10 @@ static void * SessionRunningAndDeviceAuthorizedContext = &SessionRunningAndDevic
 - (void)viewDidLoad
 {
     [super viewDidLoad];
+    
+    //uisetup
+    [self.nextButton setEnabled:NO];
+    [self.nextButton setAlpha:.5];
     
     // Create the AVCaptureSession
     AVCaptureSession *session = [[AVCaptureSession alloc] init];
@@ -293,7 +298,6 @@ static void * SessionRunningAndDeviceAuthorizedContext = &SessionRunningAndDevic
             
 //            [self copyFileToDocuments:self.movieFileOutput.outputFileURL];
             
-            NSLog(@"size of self.savedAudioLevels is %i", [self.savedAudioLevels count]);
             
             
             
@@ -302,26 +306,6 @@ static void * SessionRunningAndDeviceAuthorizedContext = &SessionRunningAndDevic
 }
 
 
-- (void) copyFileToDocuments:(NSURL *)fileURL
-{
-    NSString *documentsDirectory = [NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES) objectAtIndex:0];
-    NSDateFormatter *dateFormatter = [[NSDateFormatter alloc] init];
-    [dateFormatter setDateFormat:@"yyyy-MM-dd_HH-mm-ss"];
-    NSString *destinationPath = [documentsDirectory stringByAppendingFormat:@"/output_%@.mov", [dateFormatter stringFromDate:[NSDate date]]];
-    //	[dateFormatter release];
-    NSError	*error;
-    if (![[NSFileManager defaultManager] copyItemAtURL:fileURL toURL:[NSURL fileURLWithPath:destinationPath] error:&error]) {
-//        if ([[self delegate] respondsToSelector:@selector(captureManager:didFailWithError:)]) {
-//            [[self delegate] captureManager:self didFailWithError:error];
-//        }
-        NSLog(@"you got an error - removed error handling need to put back");
-    }
-    
-    NSLog(@"URL in the documents directory is %@", destinationPath);
-    
-    self.outputURL = [[NSURL alloc] initWithString:destinationPath];
-
-}
 
 
 
@@ -348,7 +332,10 @@ static void * SessionRunningAndDeviceAuthorizedContext = &SessionRunningAndDevic
         NSLog(@"assetURL %@", assetURL);
         self.outputURL = [[NSURL alloc] init];
         self.outputURL = assetURL;
-
+        
+        //enable next button
+        [self.nextButton setEnabled:YES];
+        [self.nextButton setAlpha:1];
 
         
         [[NSFileManager defaultManager] removeItemAtURL:outputFileURL error:nil];
@@ -356,6 +343,10 @@ static void * SessionRunningAndDeviceAuthorizedContext = &SessionRunningAndDevic
         if (backgroundRecordingID != UIBackgroundTaskInvalid)
             [[UIApplication sharedApplication] endBackgroundTask:backgroundRecordingID];
     }];
+    
+    
+    NSLog(@"size of self.savedAudioLevels is %i", [self.savedAudioLevels count]);
+
 }
 
 - (IBAction)focusAndExposeTap:(UIGestureRecognizer *)gestureRecognizer
@@ -504,7 +495,7 @@ static void * SessionRunningAndDeviceAuthorizedContext = &SessionRunningAndDevic
         self.levelIndicator.minimumValue = 0;
     
         
-        [self.savedAudioLevels addObject:[NSNumber numberWithFloat:meterLevel]];
+        [self.savedAudioLevels addObject:[NSNumber numberWithFloat:decibels]];
         
     }
     

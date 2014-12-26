@@ -76,6 +76,7 @@
                     <connections>
                         <outlet property="levelIndicator" destination="pF4-pD-afG" id="fdo-Tb-Gt6"/>
                         <outlet property="logLevelIndicator" destination="WJO-iv-Fiv" id="U85-sx-dLD"/>
+                        <outlet property="nextButton" destination="6gv-gD-xhd" id="JP5-UU-d9z"/>
                         <outlet property="recordButton" destination="0xN-Mv-rWx" id="dJD-2l-Q7k"/>
                         <outlet property="videoView" destination="nWu-xq-3Wb" id="1sg-Cd-3gl"/>
                         <outlet property="volumeDisplay" destination="nrs-st-o89" id="qJ1-Wd-G67"/>
@@ -124,7 +125,7 @@
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="f41-cx-N07" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="589" y="529"/>
+            <point key="canvasLocation" x="620" y="523"/>
         </scene>
     </scenes>
 </document>

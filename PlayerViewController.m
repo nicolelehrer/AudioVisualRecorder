@@ -11,7 +11,7 @@
 static const NSString *ItemStatusContext;
 
 @interface PlayerViewController ()
-
+@property (nonatomic) float assetLength;
 @end
 @implementation PlayerViewController
 
@@ -20,6 +20,8 @@ static const NSString *ItemStatusContext;
 @synthesize playerView = _playerView;
 @synthesize fileURL = _fileURL;
 @synthesize audioLevelSummary = _audioLevelSummary;
+
+
 
 - (void)viewDidLoad {
     [super viewDidLoad];
@@ -75,7 +77,9 @@ static const NSString *ItemStatusContext;
     
 //    NSURL *fileURL = [[NSBundle mainBundle] URLForResource:@"test" withExtension:@"mov"];
     
-    if(self.fileURL){ NSLog(@"valid url is %@", self.fileURL); }
+    if(self.fileURL){
+        NSLog(@"valid url is %@", self.fileURL);
+    }
     
     AVURLAsset *asset = [AVURLAsset URLAssetWithURL:self.fileURL options:nil];
     NSString *tracksKey = @"tracks";
@@ -107,6 +111,13 @@ static const NSString *ItemStatusContext;
                         });
 
      }];
+    
+    
+    
+    self.assetLength = CMTimeGetSeconds(asset.duration);
+    NSLog(@"length of asset: %f sec", self.assetLength);
+    [self playBackDrawing];
+    
 }
 
 - (void)observeValueForKeyPath:(NSString *)keyPath ofObject:(id)object
@@ -128,7 +139,28 @@ static const NSString *ItemStatusContext;
     [self.player play];
 }
 
+-(void)playBackDrawing
+{
+    float viewWidth = self.view.frame.size.width;
+    NSLog(@"viewWidth is %f",  viewWidth);
+    float viewSamplePerSoundSample = viewWidth/[self.audioLevelSummary count];
+    int i;
+    for (i = 0; i<[self.audioLevelSummary count]; i++) {
+        
+        int spacer = 3;
+        int baseHeight = self.view.frame.size.height-100;
+        float barHeight = 90+[[self.audioLevelSummary objectAtIndex:i] floatValue]; //-90 is the max decibel level on meter
+    
+        
+        UIView * block = [[UIView alloc] initWithFrame:CGRectMake(i*(spacer+viewSamplePerSoundSample), baseHeight-barHeight/2, viewSamplePerSoundSample-spacer, barHeight)];
+        
+        block.backgroundColor = [UIColor blackColor];
+        [self.view addSubview:block];
+        
+    }
+    
 
+}
 
 - (void)playerItemDidReachEnd:(NSNotification *)notification {
     [self.player seekToTime:kCMTimeZero];
