@@ -1,43 +1,42 @@
- //
-//  ViewController.m
+//
+//  AudioVideoCapture.m
 //  AudioVisualRecorder
 //
-//  Created by Nicole Lehrer on 12/20/14.
+//  Created by Nicole Lehrer on 12/27/14.
 //  Copyright (c) 2014 Nicole Lehrer. All rights reserved.
 //
-// modified from Apple Dev Sample Code - AVCAM for IOS
 
-#import "ViewController.h"
+#import "AudioVideoCapture.h"
+#import <CoreAudio/CoreAudioTypes.h>
 #import <AVFoundation/AVFoundation.h>
 #import <AssetsLibrary/AssetsLibrary.h>
-#import "VideoView.h"
 #import "PlayerViewController.h"
+#import "CapturePreviewView.h"
 
-static void * CapturingStillImageContext = &CapturingStillImageContext;
+#define SAMPLE_FREQ ((float) 0.25)
+
 static void * RecordingContext = &RecordingContext;
 static void * SessionRunningAndDeviceAuthorizedContext = &SessionRunningAndDeviceAuthorizedContext;
 
-@interface ViewController ()  <AVCaptureFileOutputRecordingDelegate>
+
+@interface AudioVideoCapture ()<AVCaptureFileOutputRecordingDelegate>
 
 //UI
 @property (weak, nonatomic) IBOutlet UIButton *nextButton;
-@property (nonatomic, weak) IBOutlet VideoView *videoView;
+@property (nonatomic, weak) IBOutlet CapturePreviewView *capturePreviewView;
 @property (nonatomic, weak) IBOutlet UIButton *recordButton;
-@property (nonatomic, weak) IBOutlet UIButton *cameraButton;
-@property (nonatomic, weak) IBOutlet UIButton *stillButton;
 @property (weak, nonatomic) IBOutlet UILabel *volumeDisplay;
-@property (weak, nonatomic) IBOutlet UISlider *levelIndicator;
+@property (weak, nonatomic) IBOutlet UISlider *linearLevelIndicator;
 @property (weak, nonatomic) IBOutlet UISlider *logLevelIndicator;
 
-//session management
-
+//Session Management
 @property(nonatomic, strong) AVCaptureSession * session;
 @property (nonatomic) AVCaptureDeviceInput *videoDeviceInput;
 @property (nonatomic) dispatch_queue_t sessionQueue; // Communicate with the session and other session objects on this queue.
 @property (nonatomic) AVCaptureMovieFileOutput *movieFileOutput;
 @property (nonatomic) NSURL * outputURL;
 
-//utilities
+//Utilities
 @property (nonatomic, getter = isDeviceAuthorized) BOOL deviceAuthorized;
 @property (nonatomic) UIBackgroundTaskIdentifier backgroundRecordingID;
 @property (nonatomic) BOOL lockInterfaceRotation;
@@ -45,32 +44,39 @@ static void * SessionRunningAndDeviceAuthorizedContext = &SessionRunningAndDevic
 
 @property (nonatomic) UIInterfaceOrientation newOrientation;
 
-
 //audio data
 @property (nonatomic) NSMutableArray * savedAudioLevels;
 
-
 @end
 
-@implementation ViewController
+
+
+@implementation AudioVideoCapture
 @synthesize session = _session;
 @synthesize outputURL = _outputURL;
 
-
-- (void)viewDidLoad
-{
-    [super viewDidLoad];
+- (void)viewDidLoad {
     
-    //uisetup
+    [super viewDidLoad];
+    // Do any additional setup after loading the view.
+    
+    [self setupUserInterface];
+    [self createAndSetupCaptureSession];
+    [self setupAudio];
+}
+
+-(void)setupUserInterface {
     [self.nextButton setEnabled:NO];
     [self.nextButton setAlpha:.5];
-    
+}
+
+-(void)createAndSetupCaptureSession {
     // Create the AVCaptureSession
     AVCaptureSession *session = [[AVCaptureSession alloc] init];
     [self setSession:session];
     
     // Setup the preview view
-    [[self videoView] setSession:session];
+    [[self capturePreviewView] setSession:session];
     
     // Check for device authorization
     [self checkDeviceAuthorizationStatus];
@@ -87,16 +93,14 @@ static void * SessionRunningAndDeviceAuthorizedContext = &SessionRunningAndDevic
         
         NSError *error = nil;
         
-        AVCaptureDevice *videoDevice = [ViewController deviceWithMediaType:AVMediaTypeVideo preferringPosition:AVCaptureDevicePositionFront];
+        AVCaptureDevice *videoDevice = [AudioVideoCapture deviceWithMediaType:AVMediaTypeVideo preferringPosition:AVCaptureDevicePositionFront];
         AVCaptureDeviceInput *videoDeviceInput = [AVCaptureDeviceInput deviceInputWithDevice:videoDevice error:&error];
         
-        if (error)
-        {
+        if (error){
             NSLog(@"%@", error);
         }
         
-        if ([session canAddInput:videoDeviceInput])
-        {
+        if ([session canAddInput:videoDeviceInput]){
             [session addInput:videoDeviceInput];
             [self setVideoDeviceInput:videoDeviceInput];
             
@@ -105,20 +109,19 @@ static void * SessionRunningAndDeviceAuthorizedContext = &SessionRunningAndDevic
                 // Because AVCaptureVideoPreviewLayer is the backing layer for AVCamPreviewView and UIView can only be manipulated on main thread.
                 // Note: As an exception to the above rule, it is not necessary to serialize video orientation changes on the AVCaptureVideoPreviewLayer’s connection with other session manipulation.
                 
-//                [[(AVCaptureVideoPreviewLayer *)[[self videoView] layer] connection] setVideoOrientation:(AVCaptureVideoOrientation)[self interfaceOrientation]];
+                //                [[(AVCaptureVideoPreviewLayer *)[[self videoView] layer] connection] setVideoOrientation:(AVCaptureVideoOrientation)[self interfaceOrientation]];
             });
         }
+        
         
         AVCaptureDevice *audioDevice = [[AVCaptureDevice devicesWithMediaType:AVMediaTypeAudio] firstObject];
         AVCaptureDeviceInput *audioDeviceInput = [AVCaptureDeviceInput deviceInputWithDevice:audioDevice error:&error];
         
-        if (error)
-        {
+        if (error){
             NSLog(@"%@", error);
         }
         
-        if ([session canAddInput:audioDeviceInput])
-        {
+        if ([session canAddInput:audioDeviceInput]){
             [session addInput:audioDeviceInput];
         }
         
@@ -133,28 +136,26 @@ static void * SessionRunningAndDeviceAuthorizedContext = &SessionRunningAndDevic
         }
         
     });
-    
-    
-    [NSTimer scheduledTimerWithTimeInterval:.25 target:self selector:@selector(checkAudioLevels) userInfo:nil repeats:YES];
-    
-    self.savedAudioLevels = [[NSMutableArray alloc] init];
 
 }
 
-
+-(void)setupAudio{
+    [NSTimer scheduledTimerWithTimeInterval:SAMPLE_FREQ target:self selector:@selector(checkAudioLevels) userInfo:nil repeats:YES];
+    
+    self.savedAudioLevels = [[NSMutableArray alloc] init];
+}
 
 
 - (void)viewWillAppear:(BOOL)animated
 {
     dispatch_async([self sessionQueue], ^{
         [self addObserver:self forKeyPath:@"sessionRunningAndDeviceAuthorized" options:(NSKeyValueObservingOptionOld | NSKeyValueObservingOptionNew) context:SessionRunningAndDeviceAuthorizedContext];
-//        [self addObserver:self forKeyPath:@"stillImageOutput.capturingStillImage" options:(NSKeyValueObservingOptionOld | NSKeyValueObservingOptionNew) context:CapturingStillImageContext];
         [self addObserver:self forKeyPath:@"movieFileOutput.recording" options:(NSKeyValueObservingOptionOld | NSKeyValueObservingOptionNew) context:RecordingContext];
         [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(subjectAreaDidChange:) name:AVCaptureDeviceSubjectAreaDidChangeNotification object:[[self videoDeviceInput] device]];
         
-        __weak ViewController *weakSelf = self;
+        __weak AudioVideoCapture *weakSelf = self;
         [self setRuntimeErrorHandlingObserver:[[NSNotificationCenter defaultCenter] addObserverForName:AVCaptureSessionRuntimeErrorNotification object:[self session] queue:nil usingBlock:^(NSNotification *note) {
-            ViewController *strongSelf = weakSelf;
+            AudioVideoCapture *strongSelf = weakSelf;
             dispatch_async([strongSelf sessionQueue], ^{
                 // Manually restarting the session since it must have been stopped due to an error.
                 [[strongSelf session] startRunning];
@@ -165,6 +166,7 @@ static void * SessionRunningAndDeviceAuthorizedContext = &SessionRunningAndDevic
     });
 }
 
+
 - (void)viewDidDisappear:(BOOL)animated
 {
     dispatch_async([self sessionQueue], ^{
@@ -174,7 +176,6 @@ static void * SessionRunningAndDeviceAuthorizedContext = &SessionRunningAndDevic
         [[NSNotificationCenter defaultCenter] removeObserver:[self runtimeErrorHandlingObserver]];
         
         [self removeObserver:self forKeyPath:@"sessionRunningAndDeviceAuthorized" context:SessionRunningAndDeviceAuthorizedContext];
-//        [self removeObserver:self forKeyPath:@"stillImageOutput.capturingStillImage" context:CapturingStillImageContext];
         [self removeObserver:self forKeyPath:@"movieFileOutput.recording" context:RecordingContext];
     });
 }
@@ -190,44 +191,38 @@ static void * SessionRunningAndDeviceAuthorizedContext = &SessionRunningAndDevic
     return ![self lockInterfaceRotation];
 }
 
-- (NSUInteger)supportedInterfaceOrientations
-{
-    return UIInterfaceOrientationMaskAll;
-}
 
 - (void)willRotateToInterfaceOrientation:(UIInterfaceOrientation)toInterfaceOrientation duration:(NSTimeInterval)duration
 {
-    [[(AVCaptureVideoPreviewLayer *)[[self videoView] layer] connection] setVideoOrientation:(AVCaptureVideoOrientation)toInterfaceOrientation];
+    [[(AVCaptureVideoPreviewLayer *)[[self capturePreviewView] layer] connection] setVideoOrientation:(AVCaptureVideoOrientation)toInterfaceOrientation];
     
-//    self.newOrientation = toInterfaceOrientation;
+    //    self.newOrientation = toInterfaceOrientation;
 }
 
+- (NSUInteger)supportedInterfaceOrientations
+{
+    return UIInterfaceOrientationMaskPortrait;
+}
+
+- (void)didReceiveMemoryWarning {
+    [super didReceiveMemoryWarning];
+    // Dispose of any resources that can be recreated.
+}
 
 - (void)observeValueForKeyPath:(NSString *)keyPath ofObject:(id)object change:(NSDictionary *)change context:(void *)context
 {
-    if (context == CapturingStillImageContext)
-    {
-        BOOL isCapturingStillImage = [change[NSKeyValueChangeNewKey] boolValue];
-        
-        if (isCapturingStillImage)
-        {
-//            [self runStillImageCaptureAnimation];
-        }
-    }
-    else if (context == RecordingContext)
+    if (context == RecordingContext)
     {
         BOOL isRecording = [change[NSKeyValueChangeNewKey] boolValue];
         
         dispatch_async(dispatch_get_main_queue(), ^{
             if (isRecording)
             {
-                [[self cameraButton] setEnabled:NO];
                 [[self recordButton] setTitle:NSLocalizedString(@"Stop", @"Recording button stop title") forState:UIControlStateNormal];
                 [[self recordButton] setEnabled:YES];
             }
             else
             {
-                [[self cameraButton] setEnabled:YES];
                 [[self recordButton] setTitle:NSLocalizedString(@"Record", @"Recording button record title") forState:UIControlStateNormal];
                 [[self recordButton] setEnabled:YES];
             }
@@ -238,17 +233,11 @@ static void * SessionRunningAndDeviceAuthorizedContext = &SessionRunningAndDevic
         BOOL isRunning = [change[NSKeyValueChangeNewKey] boolValue];
         
         dispatch_async(dispatch_get_main_queue(), ^{
-            if (isRunning)
-            {
-                [[self cameraButton] setEnabled:YES];
+            if (isRunning){
                 [[self recordButton] setEnabled:YES];
-                [[self stillButton] setEnabled:YES];
             }
-            else
-            {
-                [[self cameraButton] setEnabled:NO];
+            else{
                 [[self recordButton] setEnabled:NO];
-                [[self stillButton] setEnabled:NO];
             }
         });
     }
@@ -257,7 +246,6 @@ static void * SessionRunningAndDeviceAuthorizedContext = &SessionRunningAndDevic
         [super observeValueForKeyPath:keyPath ofObject:object change:change context:context];
     }
 }
-
 
 #pragma mark Actions
 
@@ -277,44 +265,26 @@ static void * SessionRunningAndDeviceAuthorizedContext = &SessionRunningAndDevic
             }
             
             // Update the orientation on the movie file output video connection before starting recording.
-            [[[self movieFileOutput] connectionWithMediaType:AVMediaTypeVideo] setVideoOrientation:[[(AVCaptureVideoPreviewLayer *)[[self videoView] layer] connection] videoOrientation]];
+            [[[self movieFileOutput] connectionWithMediaType:AVMediaTypeVideo] setVideoOrientation:[[(AVCaptureVideoPreviewLayer *)[[self capturePreviewView] layer] connection] videoOrientation]];
             
             // Turning OFF flash for video recording
-            [ViewController setFlashMode:AVCaptureFlashModeOff forDevice:[[self videoDeviceInput] device]];
+            [AudioVideoCapture setFlashMode:AVCaptureFlashModeOff forDevice:[[self videoDeviceInput] device]];
             
             // Start recording to a temporary file.
             NSString *outputFilePath = [NSTemporaryDirectory() stringByAppendingPathComponent:[@"movie" stringByAppendingPathExtension:@"mov"]];
+            
             [[self movieFileOutput] startRecordingToOutputFileURL:[NSURL fileURLWithPath:outputFilePath] recordingDelegate:self];
-            
-            
-            
         }
-        else
-        {
+        else {
             [[self movieFileOutput] stopRecording];
-            
-            
-            NSLog(@"this is the file URL at the location: %@", self.movieFileOutput.outputFileURL);
-            
-//            [self copyFileToDocuments:self.movieFileOutput.outputFileURL];
-            
-            
-            
-            
         }
     });
 }
 
 
-
-
-
-
 #pragma mark File Output Delegate
 
-- (void)captureOutput:(AVCaptureFileOutput *)captureOutput didFinishRecordingToOutputFileAtURL:(NSURL *)outputFileURL fromConnections:(NSArray *)connections error:(NSError *)error
-{
-    
+- (void)captureOutput:(AVCaptureFileOutput *)captureOutput didFinishRecordingToOutputFileAtURL:(NSURL *)outputFileURL fromConnections:(NSArray *)connections error:(NSError *)error{
     
     if (error)
         NSLog(@"%@", error);
@@ -326,32 +296,39 @@ static void * SessionRunningAndDeviceAuthorizedContext = &SessionRunningAndDevic
     [self setBackgroundRecordingID:UIBackgroundTaskInvalid];
     
     [[[ALAssetsLibrary alloc] init] writeVideoAtPathToSavedPhotosAlbum:outputFileURL completionBlock:^(NSURL *assetURL, NSError *error) {
-        if (error)
+        if (error){
             NSLog(@"%@", error);
+        }
         
         NSLog(@"assetURL %@", assetURL);
         self.outputURL = [[NSURL alloc] init];
         self.outputURL = assetURL;
         
-        //enable next button
-        [self.nextButton setEnabled:YES];
-        [self.nextButton setAlpha:1];
-
-        
         [[NSFileManager defaultManager] removeItemAtURL:outputFileURL error:nil];
         
         if (backgroundRecordingID != UIBackgroundTaskInvalid)
             [[UIApplication sharedApplication] endBackgroundTask:backgroundRecordingID];
+        
+        [self updateUserInterfaceWhenDoneRecording];
+
     }];
     
-    
-    NSLog(@"size of self.savedAudioLevels is %i", [self.savedAudioLevels count]);
+}
+
+-(void)updateUserInterfaceWhenDoneRecording{
+    //enable next button
+    [self.nextButton setEnabled:YES];
+    [self.nextButton setAlpha:1];
 
 }
 
+
+
+
+
 - (IBAction)focusAndExposeTap:(UIGestureRecognizer *)gestureRecognizer
 {
-    CGPoint devicePoint = [(AVCaptureVideoPreviewLayer *)[[self videoView] layer] captureDevicePointOfInterestForPoint:[gestureRecognizer locationInView:[gestureRecognizer view]]];
+    CGPoint devicePoint = [(AVCaptureVideoPreviewLayer *)[[self capturePreviewView] layer] captureDevicePointOfInterestForPoint:[gestureRecognizer locationInView:[gestureRecognizer view]]];
     [self focusWithMode:AVCaptureFocusModeAutoFocus exposeWithMode:AVCaptureExposureModeAutoExpose atDevicePoint:devicePoint monitorSubjectAreaChange:YES];
 }
 
@@ -426,14 +403,6 @@ static void * SessionRunningAndDeviceAuthorizedContext = &SessionRunningAndDevic
 
 
 
-
-- (void)didReceiveMemoryWarning {
-    [super didReceiveMemoryWarning];
-    // Dispose of any resources that can be recreated.
-}
-
-
-
 - (void)checkDeviceAuthorizationStatus
 {
     NSString *mediaType = AVMediaTypeVideo;
@@ -460,40 +429,40 @@ static void * SessionRunningAndDeviceAuthorizedContext = &SessionRunningAndDevic
 }
 
 
-//monitor audio
+
+
+# pragma mark - Audio Data
 
 - (void)checkAudioLevels
 {
     if ([[self movieFileOutput] isRecording]) {
         
-          NSInteger channelCount = 0;
-         float decibels = 0.f;
-         
-         // Sum all of the average power levels and divide by the number of channels
-         for (AVCaptureConnection *connection in [[self movieFileOutput] connections]) {
-             for (AVCaptureAudioChannel *audioChannel in [connection audioChannels]) {
+        NSInteger channelCount = 0;
+        float decibels = 0.f;
+        
+        // Sum all of the average power levels and divide by the number of channels
+        for (AVCaptureConnection *connection in [[self movieFileOutput] connections]) {
+            for (AVCaptureAudioChannel *audioChannel in [connection audioChannels]) {
                 decibels += [audioChannel averagePowerLevel];
                 channelCount += 1;
-             }
-         }
-         
-         decibels /= channelCount;
-         
-    //     [[self audioLevelMeter] setFloatValue:(pow(10.f, 0.05f * decibels) * 20.0f)];
+            }
+        }
         
+        decibels /= channelCount;
+            
         
         self.logLevelIndicator.value = decibels;
         self.logLevelIndicator.maximumValue = 0;
         self.logLevelIndicator.minimumValue = -90;
         
         
-        float meterLevel = pow(10.f, 0.05f * decibels) * 20.0f;
+        float linearMeterLevel = pow(10.f, 0.05f * decibels) * 20.0f;
         self.volumeDisplay.text = [NSString stringWithFormat:@"%f", decibels];
         
-        self.levelIndicator.value = meterLevel;
-        self.levelIndicator.maximumValue = 14;
-        self.levelIndicator.minimumValue = 0;
-    
+        self.linearLevelIndicator.value = linearMeterLevel;
+        self.linearLevelIndicator.maximumValue = 14;
+        self.linearLevelIndicator.minimumValue = 0;
+        
         
         [self.savedAudioLevels addObject:[NSNumber numberWithFloat:decibels]];
         
@@ -502,7 +471,7 @@ static void * SessionRunningAndDeviceAuthorizedContext = &SessionRunningAndDevic
     
     
     /*
-    
+     
      http://stackoverflow.com/questions/2465328/iphone-sdk-avaudiorecorder-metering-how-to-change-peakpowerforchannel-from-d
      
      The range is from -160 dB to 0 dB. You probably want to display it in a meter that goes from -90 dB to 0 dB. Displaying it as decibels is actually more useful than as a linear audio level, because the decibels are a logarithmic scale, which means that it more closely approximates how loud we perceive a sound.
@@ -520,33 +489,13 @@ static void * SessionRunningAndDeviceAuthorizedContext = &SessionRunningAndDevic
     
 }
 
+#pragma mark - Navigation
 
-//segue
-
-- (void)prepareForSegue:(UIStoryboardSegue *)segue sender:(id)sender
-{
+- (void)prepareForSegue:(UIStoryboardSegue *)segue sender:(id)sender {
     if ([[segue identifier] isEqualToString:@"TestLoad"]) {
-        
-
-        
         PlayerViewController * avmvc = segue.destinationViewController;
-        
         avmvc.fileURL = self.outputURL;
-
-        NSLog(@"this is local file URL: %@", self.outputURL);
-//
-        NSLog(@"this is passed file URL: %@", avmvc.fileURL);
-        
         avmvc.audioLevelSummary = self.savedAudioLevels;
-        
-        int i;
-        
-        for (i=0; i<[self.savedAudioLevels count]; i++){
-            NSLog(@"saved level at position %i is %f", i, [[self.savedAudioLevels objectAtIndex:i]floatValue]);
-        
-        }
-
-        
     }
 }
 

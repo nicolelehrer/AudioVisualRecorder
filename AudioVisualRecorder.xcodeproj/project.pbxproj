@@ -9,14 +9,15 @@
 /* Begin PBXBuildFile section */
 		A204C7C91A4622DC00654361 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = A204C7C81A4622DC00654361 /* main.m */; };
 		A204C7CC1A4622DC00654361 /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = A204C7CB1A4622DC00654361 /* AppDelegate.m */; };
-		A204C7CF1A4622DC00654361 /* ViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = A204C7CE1A4622DC00654361 /* ViewController.m */; };
 		A204C7D21A4622DC00654361 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = A204C7D01A4622DC00654361 /* Main.storyboard */; };
 		A204C7D41A4622DC00654361 /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = A204C7D31A4622DC00654361 /* Images.xcassets */; };
 		A204C7D71A4622DC00654361 /* LaunchScreen.xib in Resources */ = {isa = PBXBuildFile; fileRef = A204C7D51A4622DC00654361 /* LaunchScreen.xib */; };
 		A204C7E31A4622DC00654361 /* AudioVisualRecorderTests.m in Sources */ = {isa = PBXBuildFile; fileRef = A204C7E21A4622DC00654361 /* AudioVisualRecorderTests.m */; };
-		A204C7EE1A4634A600654361 /* VideoView.m in Sources */ = {isa = PBXBuildFile; fileRef = A204C7ED1A4634A600654361 /* VideoView.m */; };
 		A204C7F81A48F71400654361 /* PlayerView.m in Sources */ = {isa = PBXBuildFile; fileRef = A204C7F71A48F71400654361 /* PlayerView.m */; };
 		A204C7FB1A48F76900654361 /* PlayerViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = A204C7FA1A48F76900654361 /* PlayerViewController.m */; };
+		A2CD710A1A4E3133002589F4 /* HomeViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = A2CD71091A4E3133002589F4 /* HomeViewController.m */; };
+		A2CD710D1A4F5051002589F4 /* AudioVideoCapture.m in Sources */ = {isa = PBXBuildFile; fileRef = A2CD710C1A4F5051002589F4 /* AudioVideoCapture.m */; };
+		A2CD71101A4F537B002589F4 /* CapturePreviewView.m in Sources */ = {isa = PBXBuildFile; fileRef = A2CD710F1A4F537B002589F4 /* CapturePreviewView.m */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -35,20 +36,22 @@
 		A204C7C81A4622DC00654361 /* main.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
 		A204C7CA1A4622DC00654361 /* AppDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AppDelegate.h; sourceTree = "<group>"; };
 		A204C7CB1A4622DC00654361 /* AppDelegate.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = AppDelegate.m; sourceTree = "<group>"; };
-		A204C7CD1A4622DC00654361 /* ViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ViewController.h; sourceTree = "<group>"; };
-		A204C7CE1A4622DC00654361 /* ViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = ViewController.m; sourceTree = "<group>"; };
 		A204C7D11A4622DC00654361 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
 		A204C7D31A4622DC00654361 /* Images.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Images.xcassets; sourceTree = "<group>"; };
 		A204C7D61A4622DC00654361 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = Base; path = Base.lproj/LaunchScreen.xib; sourceTree = "<group>"; };
 		A204C7DC1A4622DC00654361 /* AudioVisualRecorderTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = AudioVisualRecorderTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		A204C7E11A4622DC00654361 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		A204C7E21A4622DC00654361 /* AudioVisualRecorderTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = AudioVisualRecorderTests.m; sourceTree = "<group>"; };
-		A204C7EC1A4634A600654361 /* VideoView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = VideoView.h; path = ../VideoView.h; sourceTree = "<group>"; };
-		A204C7ED1A4634A600654361 /* VideoView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = VideoView.m; path = ../VideoView.m; sourceTree = "<group>"; };
-		A204C7F61A48F71400654361 /* PlayerView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PlayerView.h; sourceTree = "<group>"; };
-		A204C7F71A48F71400654361 /* PlayerView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PlayerView.m; sourceTree = "<group>"; };
-		A204C7F91A48F76900654361 /* PlayerViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PlayerViewController.h; sourceTree = "<group>"; };
-		A204C7FA1A48F76900654361 /* PlayerViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PlayerViewController.m; sourceTree = "<group>"; };
+		A204C7F61A48F71400654361 /* PlayerView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = PlayerView.h; path = ../PlayerView.h; sourceTree = "<group>"; };
+		A204C7F71A48F71400654361 /* PlayerView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = PlayerView.m; path = ../PlayerView.m; sourceTree = "<group>"; };
+		A204C7F91A48F76900654361 /* PlayerViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = PlayerViewController.h; path = ../PlayerViewController.h; sourceTree = "<group>"; };
+		A204C7FA1A48F76900654361 /* PlayerViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = PlayerViewController.m; path = ../PlayerViewController.m; sourceTree = "<group>"; };
+		A2CD71081A4E3133002589F4 /* HomeViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = HomeViewController.h; sourceTree = "<group>"; };
+		A2CD71091A4E3133002589F4 /* HomeViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = HomeViewController.m; sourceTree = "<group>"; };
+		A2CD710B1A4F5051002589F4 /* AudioVideoCapture.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AudioVideoCapture.h; sourceTree = "<group>"; };
+		A2CD710C1A4F5051002589F4 /* AudioVideoCapture.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = AudioVideoCapture.m; sourceTree = "<group>"; };
+		A2CD710E1A4F537B002589F4 /* CapturePreviewView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CapturePreviewView.h; sourceTree = "<group>"; };
+		A2CD710F1A4F537B002589F4 /* CapturePreviewView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CapturePreviewView.m; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -72,10 +75,6 @@
 		A204C7BA1A4622DC00654361 = {
 			isa = PBXGroup;
 			children = (
-				A204C7F61A48F71400654361 /* PlayerView.h */,
-				A204C7F71A48F71400654361 /* PlayerView.m */,
-				A204C7F91A48F76900654361 /* PlayerViewController.h */,
-				A204C7FA1A48F76900654361 /* PlayerViewController.m */,
 				A204C7C51A4622DC00654361 /* AudioVisualRecorder */,
 				A204C7DF1A4622DC00654361 /* AudioVisualRecorderTests */,
 				A204C7C41A4622DC00654361 /* Products */,
@@ -94,12 +93,18 @@
 		A204C7C51A4622DC00654361 /* AudioVisualRecorder */ = {
 			isa = PBXGroup;
 			children = (
-				A204C7EC1A4634A600654361 /* VideoView.h */,
-				A204C7ED1A4634A600654361 /* VideoView.m */,
+				A2CD71081A4E3133002589F4 /* HomeViewController.h */,
+				A2CD71091A4E3133002589F4 /* HomeViewController.m */,
+				A2CD710B1A4F5051002589F4 /* AudioVideoCapture.h */,
+				A2CD710C1A4F5051002589F4 /* AudioVideoCapture.m */,
+				A2CD710E1A4F537B002589F4 /* CapturePreviewView.h */,
+				A2CD710F1A4F537B002589F4 /* CapturePreviewView.m */,
+				A204C7F61A48F71400654361 /* PlayerView.h */,
+				A204C7F71A48F71400654361 /* PlayerView.m */,
+				A204C7F91A48F76900654361 /* PlayerViewController.h */,
+				A204C7FA1A48F76900654361 /* PlayerViewController.m */,
 				A204C7CA1A4622DC00654361 /* AppDelegate.h */,
 				A204C7CB1A4622DC00654361 /* AppDelegate.m */,
-				A204C7CD1A4622DC00654361 /* ViewController.h */,
-				A204C7CE1A4622DC00654361 /* ViewController.m */,
 				A204C7D01A4622DC00654361 /* Main.storyboard */,
 				A204C7D31A4622DC00654361 /* Images.xcassets */,
 				A204C7D51A4622DC00654361 /* LaunchScreen.xib */,
@@ -234,11 +239,12 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				A204C7EE1A4634A600654361 /* VideoView.m in Sources */,
-				A204C7CF1A4622DC00654361 /* ViewController.m in Sources */,
+				A2CD71101A4F537B002589F4 /* CapturePreviewView.m in Sources */,
 				A204C7CC1A4622DC00654361 /* AppDelegate.m in Sources */,
+				A2CD710D1A4F5051002589F4 /* AudioVideoCapture.m in Sources */,
 				A204C7C91A4622DC00654361 /* main.m in Sources */,
 				A204C7F81A48F71400654361 /* PlayerView.m in Sources */,
+				A2CD710A1A4E3133002589F4 /* HomeViewController.m in Sources */,
 				A204C7FB1A48F76900654361 /* PlayerViewController.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -364,6 +370,7 @@
 				INFOPLIST_FILE = AudioVisualRecorder/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				TARGETED_DEVICE_FAMILY = 2;
 			};
 			name = Debug;
 		};
@@ -374,6 +381,7 @@
 				INFOPLIST_FILE = AudioVisualRecorder/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				TARGETED_DEVICE_FAMILY = 2;
 			};
 			name = Release;
 		};
