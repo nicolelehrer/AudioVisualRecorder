@@ -12,6 +12,7 @@ static const NSString *ItemStatusContext;
 
 @interface PlayerViewController ()
 @property (nonatomic) float assetLength;
+@property (nonatomic) float playBackCounter;
 @end
 @implementation PlayerViewController
 
@@ -20,7 +21,7 @@ static const NSString *ItemStatusContext;
 @synthesize playerView = _playerView;
 @synthesize fileURL = _fileURL;
 @synthesize audioLevelSummary = _audioLevelSummary;
-
+@synthesize playBackCounter = _playBackCounter;
 
 
 - (void)viewDidLoad {
@@ -137,6 +138,44 @@ static const NSString *ItemStatusContext;
 
 - (IBAction)play:sender {
     [self.player play];
+    [self startAnimation];
+    
+}
+
+-(void)startAnimation
+{
+    [NSTimer scheduledTimerWithTimeInterval:.25 target:self selector:@selector(realTimeplayBackDrawing) userInfo:nil repeats:YES];
+
+}
+
+-(void)realTimeplayBackDrawing
+{
+    
+    if (CMTimeGetSeconds(self.playerItem.currentTime) < self.assetLength && CMTimeGetSeconds(self.playerItem.currentTime) > 0) {
+        NSLog(@"comparing this current time %f to total time %f", CMTimeGetSeconds(self.playerItem.currentTime), self.assetLength);
+        
+        
+        float viewWidth = self.view.frame.size.width;
+        float viewSamplePerSoundSample = viewWidth/[self.audioLevelSummary count];
+        
+        
+            int spacer = 1;
+            int baseHeight = self.view.frame.size.height-100;
+            float barHeight = 90+[[self.audioLevelSummary objectAtIndex:self.playBackCounter] floatValue]; //-90 is the max decibel level on meter
+            
+            
+            UIView * block = [[UIView alloc] initWithFrame:CGRectMake(self.playBackCounter*(spacer+viewSamplePerSoundSample), baseHeight-barHeight/2, viewSamplePerSoundSample-spacer, barHeight)];
+            
+            block.backgroundColor = [UIColor blueColor];
+            [self.view addSubview:block];
+            
+        self.playBackCounter++;
+        
+        
+        
+        
+    }
+
 }
 
 -(void)playBackDrawing
@@ -147,7 +186,7 @@ static const NSString *ItemStatusContext;
     int i;
     for (i = 0; i<[self.audioLevelSummary count]; i++) {
         
-        int spacer = 3;
+        int spacer = 1;
         int baseHeight = self.view.frame.size.height-100;
         float barHeight = 90+[[self.audioLevelSummary objectAtIndex:i] floatValue]; //-90 is the max decibel level on meter
     
