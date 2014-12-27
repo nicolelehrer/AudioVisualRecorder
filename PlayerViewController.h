@@ -21,7 +21,6 @@
 @property (nonatomic) NSMutableArray * audioLevelSummary;
 
 
-- (IBAction)loadAssetFromFile:sender;
 - (IBAction)play:sender;
 - (void)syncUI;
 @end

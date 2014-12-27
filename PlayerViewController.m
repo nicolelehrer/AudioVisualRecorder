@@ -8,11 +8,13 @@
 
 #import "PlayerView.h"
 #import "PlayerViewController.h"
+#import "Constants.h"
 static const NSString *ItemStatusContext;
 
 @interface PlayerViewController ()
 @property (nonatomic) float assetLength;
 @property (nonatomic) float playBackCounter;
+@property (nonatomic) NSTimer * audioSampleTimer;
 @end
 @implementation PlayerViewController
 
@@ -37,23 +39,20 @@ static const NSString *ItemStatusContext;
     [self.view addSubview:self.playerView];
     
     
-    [[NSNotificationCenter defaultCenter]
-     addObserver:self
-     selector:@selector(playerItemDidReachEnd:)
-     name:AVPlayerItemDidPlayToEndTimeNotification
-     object:[self.player currentItem]];
+//    [[NSNotificationCenter defaultCenter]
+//     addObserver:self
+//     selector:@selector(playerItemDidReachEnd:)
+//     name:AVPlayerItemDidPlayToEndTimeNotification
+//     object:[self.player currentItem]];
 
+    
+    [self loadAssetFromFile];
+    
+    
     
 //    i think it's important to display the full stream before playback because visually it allows the patient to look at the biggest drop or peak in the audio levels and focus their attention in advance of hearing the audio that caused it. then when the audio plays back, you should provide a real-time updater (each audio level segment corresponds to .25 second sample, so draw a another highlight bar when that segment is being played) so that the patient can then be ready to hear to word(s) that caused this drop in volume or peak. 
     
     
-    NSLog(@"received array is %i", [self.audioLevelSummary count]);
-    int i;
-    
-    for (i=0; i<[self.audioLevelSummary count]; i++){
-        NSLog(@"in second view saved level at position %i is %f", i, [[self.audioLevelSummary objectAtIndex:i]floatValue]);
-        
-    }
 }
 
 - (void)didReceiveMemoryWarning {
@@ -72,7 +71,7 @@ static const NSString *ItemStatusContext;
     }
 }
 
-- (IBAction)loadAssetFromFile:sender {
+- (void)loadAssetFromFile {
     
   //add if we are observing then remove observer to prevent errors.
     
@@ -98,10 +97,18 @@ static const NSString *ItemStatusContext;
                                 // ensure that this is done before the playerItem is associated with the player
                                 [self.playerItem addObserver:self forKeyPath:@"status"
                                                      options:NSKeyValueObservingOptionInitial context:&ItemStatusContext];
+                                
                                 [[NSNotificationCenter defaultCenter] addObserver:self
                                                                          selector:@selector(playerItemDidReachEnd:)
                                                                              name:AVPlayerItemDidPlayToEndTimeNotification
                                                                            object:self.playerItem];
+                                
+                                
+        
+                                
+                                
+                                
+                                
                                 self.player = [AVPlayer playerWithPlayerItem:self.playerItem];
                                 [self.playerView setPlayer:self.player];
                             }
@@ -121,6 +128,26 @@ static const NSString *ItemStatusContext;
     
 }
 
+
+- (void)viewWillDisappear:(BOOL)animated
+{
+    [self.player pause];
+    
+    
+    dispatch_async(dispatch_get_main_queue(), ^{
+        
+        [[NSNotificationCenter defaultCenter] removeObserver:self name:AVPlayerItemDidPlayToEndTimeNotification object:self.playerItem];
+        
+        if (self.player != nil && [self.player currentItem] != nil){
+            [self.playerItem removeObserver:self forKeyPath:@"status"];
+        }
+        
+        
+        [self.audioSampleTimer invalidate];
+        
+    });
+}
+
 - (void)observeValueForKeyPath:(NSString *)keyPath ofObject:(id)object
                         change:(NSDictionary *)change context:(void *)context {
     
@@ -128,9 +155,15 @@ static const NSString *ItemStatusContext;
         dispatch_async(dispatch_get_main_queue(),
                        ^{
                            [self syncUI];
+                           
                        });
         return;
     }
+    
+    
+    
+    
+    
     [super observeValueForKeyPath:keyPath ofObject:object
                            change:change context:context];
     return;
@@ -144,7 +177,7 @@ static const NSString *ItemStatusContext;
 
 -(void)startAnimation
 {
-    [NSTimer scheduledTimerWithTimeInterval:.25 target:self selector:@selector(realTimeplayBackDrawing) userInfo:nil repeats:YES];
+    self.audioSampleTimer = [NSTimer scheduledTimerWithTimeInterval:SAMPLE_FREQ target:self selector:@selector(realTimeplayBackDrawing) userInfo:nil repeats:YES];
 
 }
 

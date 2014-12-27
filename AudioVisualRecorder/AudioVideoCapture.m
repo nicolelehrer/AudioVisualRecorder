@@ -12,8 +12,7 @@
 #import <AssetsLibrary/AssetsLibrary.h>
 #import "PlayerViewController.h"
 #import "CapturePreviewView.h"
-
-#define SAMPLE_FREQ ((float) 0.25)
+#import "Constants.h"
 
 static void * RecordingContext = &RecordingContext;
 static void * SessionRunningAndDeviceAuthorizedContext = &SessionRunningAndDeviceAuthorizedContext;
@@ -46,6 +45,7 @@ static void * SessionRunningAndDeviceAuthorizedContext = &SessionRunningAndDevic
 
 //audio data
 @property (nonatomic) NSMutableArray * savedAudioLevels;
+@property (nonatomic) NSTimer * sampleAudioTimer;
 
 @end
 
@@ -62,7 +62,6 @@ static void * SessionRunningAndDeviceAuthorizedContext = &SessionRunningAndDevic
     
     [self setupUserInterface];
     [self createAndSetupCaptureSession];
-    [self setupAudio];
 }
 
 -(void)setupUserInterface {
@@ -140,7 +139,7 @@ static void * SessionRunningAndDeviceAuthorizedContext = &SessionRunningAndDevic
 }
 
 -(void)setupAudio{
-    [NSTimer scheduledTimerWithTimeInterval:SAMPLE_FREQ target:self selector:@selector(checkAudioLevels) userInfo:nil repeats:YES];
+    self.sampleAudioTimer = [NSTimer scheduledTimerWithTimeInterval:SAMPLE_FREQ target:self selector:@selector(checkAudioLevels) userInfo:nil repeats:YES];
     
     self.savedAudioLevels = [[NSMutableArray alloc] init];
 }
@@ -148,6 +147,10 @@ static void * SessionRunningAndDeviceAuthorizedContext = &SessionRunningAndDevic
 
 - (void)viewWillAppear:(BOOL)animated
 {
+    [self setupAudio];
+    [self setupUserInterface];
+
+    
     dispatch_async([self sessionQueue], ^{
         [self addObserver:self forKeyPath:@"sessionRunningAndDeviceAuthorized" options:(NSKeyValueObservingOptionOld | NSKeyValueObservingOptionNew) context:SessionRunningAndDeviceAuthorizedContext];
         [self addObserver:self forKeyPath:@"movieFileOutput.recording" options:(NSKeyValueObservingOptionOld | NSKeyValueObservingOptionNew) context:RecordingContext];
@@ -177,13 +180,14 @@ static void * SessionRunningAndDeviceAuthorizedContext = &SessionRunningAndDevic
         
         [self removeObserver:self forKeyPath:@"sessionRunningAndDeviceAuthorized" context:SessionRunningAndDeviceAuthorizedContext];
         [self removeObserver:self forKeyPath:@"movieFileOutput.recording" context:RecordingContext];
+        
+        [self.sampleAudioTimer invalidate];
     });
+    
+    
+    
 }
 
-- (BOOL)prefersStatusBarHidden
-{
-    return YES;
-}
 
 - (BOOL)shouldAutorotate
 {

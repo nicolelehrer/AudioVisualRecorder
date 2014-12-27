@@ -47,7 +47,7 @@
                                 </connections>
                             </button>
                             <view contentMode="scaleToFill" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="TqG-YJ-2eg" customClass="CapturePreviewView">
-                                <rect key="frame" x="138" y="72" width="291" height="305"/>
+                                <rect key="frame" x="138" y="176" width="192" height="201"/>
                                 <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                             </view>
                         </subviews>
@@ -85,15 +85,6 @@
                                 </state>
                                 <connections>
                                     <action selector="play:" destination="0TN-YV-ub2" eventType="touchUpInside" id="ZHi-Bx-cKb"/>
-                                </connections>
-                            </button>
-                            <button opaque="NO" contentMode="scaleToFill" fixedFrame="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="swn-UA-oeg">
-                                <rect key="frame" x="112" y="492" width="30" height="30"/>
-                                <state key="normal" title="load">
-                                    <color key="titleShadowColor" white="0.5" alpha="1" colorSpace="calibratedWhite"/>
-                                </state>
-                                <connections>
-                                    <action selector="loadAssetFromFile:" destination="0TN-YV-ub2" eventType="touchUpInside" id="KC1-c7-HPI"/>
                                 </connections>
                             </button>
                         </subviews>

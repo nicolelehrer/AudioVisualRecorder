@@ -52,6 +52,7 @@
 		A2CD710C1A4F5051002589F4 /* AudioVideoCapture.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = AudioVideoCapture.m; sourceTree = "<group>"; };
 		A2CD710E1A4F537B002589F4 /* CapturePreviewView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CapturePreviewView.h; sourceTree = "<group>"; };
 		A2CD710F1A4F537B002589F4 /* CapturePreviewView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CapturePreviewView.m; sourceTree = "<group>"; };
+		A2CD71111A4F69A9002589F4 /* Constants.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = Constants.h; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -97,6 +98,7 @@
 				A2CD71091A4E3133002589F4 /* HomeViewController.m */,
 				A2CD710B1A4F5051002589F4 /* AudioVideoCapture.h */,
 				A2CD710C1A4F5051002589F4 /* AudioVideoCapture.m */,
+				A2CD71111A4F69A9002589F4 /* Constants.h */,
 				A2CD710E1A4F537B002589F4 /* CapturePreviewView.h */,
 				A2CD710F1A4F537B002589F4 /* CapturePreviewView.m */,
 				A204C7F61A48F71400654361 /* PlayerView.h */,
