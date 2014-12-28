@@ -32,11 +32,13 @@ static const NSString *ItemStatusContext;
     [self syncUI];
     
     
-    self.playerView = [[PlayerView alloc] initWithFrame:CGRectMake(100, 100, 200,200)];
+//    self.playerView = [[PlayerView alloc] initWithFrame:CGRectMake(100, 100, 200,200)];
+    
+//    self.playerView = [[PlayerView alloc] init];
     
     self.playerView.backgroundColor = [UIColor blackColor];
     
-    [self.view addSubview:self.playerView];
+//    [self.view addSubview:self.playerView];
     
     
 //    [[NSNotificationCenter defaultCenter]

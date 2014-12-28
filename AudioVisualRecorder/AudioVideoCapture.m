@@ -24,7 +24,8 @@ static void * SessionRunningAndDeviceAuthorizedContext = &SessionRunningAndDevic
 @property (weak, nonatomic) IBOutlet UIButton *nextButton;
 @property (nonatomic, weak) IBOutlet CapturePreviewView *capturePreviewView;
 @property (nonatomic, weak) IBOutlet UIButton *recordButton;
-@property (weak, nonatomic) IBOutlet UILabel *volumeDisplay;
+@property (weak, nonatomic) IBOutlet UILabel *linearLevelDisplay;
+@property (weak, nonatomic) IBOutlet UILabel *logLevelDisplay;
 @property (weak, nonatomic) IBOutlet UISlider *linearLevelIndicator;
 @property (weak, nonatomic) IBOutlet UISlider *logLevelIndicator;
 
@@ -461,7 +462,9 @@ static void * SessionRunningAndDeviceAuthorizedContext = &SessionRunningAndDevic
         
         
         float linearMeterLevel = pow(10.f, 0.05f * decibels) * 20.0f;
-        self.volumeDisplay.text = [NSString stringWithFormat:@"%f", decibels];
+        
+        self.logLevelDisplay.text = [NSString stringWithFormat:@"%f", decibels];
+        self.linearLevelDisplay.text = [NSString stringWithFormat:@"%f", linearMeterLevel];
         
         self.linearLevelIndicator.value = linearMeterLevel;
         self.linearLevelIndicator.maximumValue = 14;
