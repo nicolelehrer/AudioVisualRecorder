@@ -15,6 +15,7 @@
 		A204C7E31A4622DC00654361 /* AudioVisualRecorderTests.m in Sources */ = {isa = PBXBuildFile; fileRef = A204C7E21A4622DC00654361 /* AudioVisualRecorderTests.m */; };
 		A204C7F81A48F71400654361 /* PlayerView.m in Sources */ = {isa = PBXBuildFile; fileRef = A204C7F71A48F71400654361 /* PlayerView.m */; };
 		A204C7FB1A48F76900654361 /* PlayerViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = A204C7FA1A48F76900654361 /* PlayerViewController.m */; };
+		A2CAF31C1B10FBEA00D14F33 /* RFAudioVideoCapture.m in Sources */ = {isa = PBXBuildFile; fileRef = A2CAF31B1B10FBEA00D14F33 /* RFAudioVideoCapture.m */; };
 		A2CD710A1A4E3133002589F4 /* HomeViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = A2CD71091A4E3133002589F4 /* HomeViewController.m */; };
 		A2CD710D1A4F5051002589F4 /* AudioVideoCapture.m in Sources */ = {isa = PBXBuildFile; fileRef = A2CD710C1A4F5051002589F4 /* AudioVideoCapture.m */; };
 		A2CD71101A4F537B002589F4 /* CapturePreviewView.m in Sources */ = {isa = PBXBuildFile; fileRef = A2CD710F1A4F537B002589F4 /* CapturePreviewView.m */; };
@@ -46,6 +47,8 @@
 		A204C7F71A48F71400654361 /* PlayerView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = PlayerView.m; path = ../PlayerView.m; sourceTree = "<group>"; };
 		A204C7F91A48F76900654361 /* PlayerViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = PlayerViewController.h; path = ../PlayerViewController.h; sourceTree = "<group>"; };
 		A204C7FA1A48F76900654361 /* PlayerViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = PlayerViewController.m; path = ../PlayerViewController.m; sourceTree = "<group>"; };
+		A2CAF31A1B10FBEA00D14F33 /* RFAudioVideoCapture.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RFAudioVideoCapture.h; sourceTree = "<group>"; };
+		A2CAF31B1B10FBEA00D14F33 /* RFAudioVideoCapture.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = RFAudioVideoCapture.m; sourceTree = "<group>"; };
 		A2CD71081A4E3133002589F4 /* HomeViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = HomeViewController.h; sourceTree = "<group>"; };
 		A2CD71091A4E3133002589F4 /* HomeViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = HomeViewController.m; sourceTree = "<group>"; };
 		A2CD710B1A4F5051002589F4 /* AudioVideoCapture.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AudioVideoCapture.h; sourceTree = "<group>"; };
@@ -98,6 +101,8 @@
 				A2CD71091A4E3133002589F4 /* HomeViewController.m */,
 				A2CD710B1A4F5051002589F4 /* AudioVideoCapture.h */,
 				A2CD710C1A4F5051002589F4 /* AudioVideoCapture.m */,
+				A2CAF31A1B10FBEA00D14F33 /* RFAudioVideoCapture.h */,
+				A2CAF31B1B10FBEA00D14F33 /* RFAudioVideoCapture.m */,
 				A2CD71111A4F69A9002589F4 /* Constants.h */,
 				A2CD710E1A4F537B002589F4 /* CapturePreviewView.h */,
 				A2CD710F1A4F537B002589F4 /* CapturePreviewView.m */,
@@ -246,6 +251,7 @@
 				A2CD710D1A4F5051002589F4 /* AudioVideoCapture.m in Sources */,
 				A204C7C91A4622DC00654361 /* main.m in Sources */,
 				A204C7F81A48F71400654361 /* PlayerView.m in Sources */,
+				A2CAF31C1B10FBEA00D14F33 /* RFAudioVideoCapture.m in Sources */,
 				A2CD710A1A4E3133002589F4 /* HomeViewController.m in Sources */,
 				A204C7FB1A48F76900654361 /* PlayerViewController.m in Sources */,
 			);
