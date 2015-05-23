@@ -220,7 +220,11 @@
                         <subviews>
                             <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="qrZ-5q-37W" customClass="PlayerView">
                                 <rect key="frame" x="150" y="101" width="300" height="300"/>
-                                <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                                <color key="backgroundColor" white="0.0" alpha="1" colorSpace="calibratedWhite"/>
+                                <constraints>
+                                    <constraint firstAttribute="width" constant="300" id="nGr-m3-aQI"/>
+                                    <constraint firstAttribute="height" constant="300" id="ug2-2o-Dy5"/>
+                                </constraints>
                             </view>
                             <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="U0K-6b-3e8">
                                 <rect key="frame" x="285" y="433" width="30" height="30"/>
@@ -234,11 +238,11 @@
                         </subviews>
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                         <constraints>
+                            <constraint firstAttribute="centerX" secondItem="qrZ-5q-37W" secondAttribute="centerX" id="1LW-VZ-kzQ"/>
                             <constraint firstItem="qrZ-5q-37W" firstAttribute="centerY" secondItem="7Xi-YC-R8C" secondAttribute="centerY" constant="-49" id="BNm-PP-2OH"/>
                             <constraint firstItem="qrZ-5q-37W" firstAttribute="centerX" secondItem="7Xi-YC-R8C" secondAttribute="centerX" id="HHC-Pp-aFY"/>
                             <constraint firstItem="qrZ-5q-37W" firstAttribute="centerX" secondItem="U0K-6b-3e8" secondAttribute="centerX" id="HHg-E2-pNf"/>
                             <constraint firstItem="U0K-6b-3e8" firstAttribute="top" secondItem="qrZ-5q-37W" secondAttribute="bottom" constant="32" id="cCd-Yy-HRN"/>
-                            <constraint firstItem="qrZ-5q-37W" firstAttribute="leading" secondItem="7Xi-YC-R8C" secondAttribute="leading" constant="150" id="dVo-PZ-BlG"/>
                             <constraint firstItem="qrZ-5q-37W" firstAttribute="top" secondItem="Ypw-Tm-rXT" secondAttribute="bottom" constant="37" id="rr8-Eq-BRm"/>
                         </constraints>
                     </view>
